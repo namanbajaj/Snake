@@ -1,26 +1,4 @@
-# Raylib Setup using Premake5
-This is a simplified set of instructions for how to setup a project using premake.
-
-## Video Tutorial
-A video covering this process is here
-https://youtu.be/--gI9083QnU
-
-# Download this repository
-Download the game premake repository from 
-https://github.com/raylib-extras/game-premake/
-You can either download the zip file, or clone the repository.
-If you clone the repository, you may want to remove the stored history. Simply delete the .git directory to do this.
-
-Rename the directory whatever you want. This will be the name of your game.
-
-# Example app
-This repository is pre-populated wit the raylib game template. It is a great starting point for your game.
-https://github.com/raysan5/raylib-game-template
-
-If you want to have a different starting point, simply replace the files in the game folder with your own files.
-
-## Using C++
-By default this process is setup to build a project using C. If you want to use C++, you can replace your files with you own cpp files. There is is a simple C++ file in the extras/app_cpp dir. The raylib template is designed for C, not C++, but the version in this repository has been modified to work as C++ if you choose to rename the files.
+# Snake Game Built in raylib (C++)
 
 # Generate Projects
 For windows users, there are two batch files you can use depending on what compiler you are using. For linux users you can simply use a terminal.
