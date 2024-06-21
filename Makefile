@@ -52,11 +52,16 @@ snake: raylib
 ifneq (,$(snake_config))
 	@echo "==== Building snake ($(snake_config)) ===="
 	@${MAKE} --no-print-directory -C game -f Makefile config=$(snake_config)
+
+	mkdir -p bin/Debug/game/src/assets/
+	cp -r game/src/assets/ bin/Debug/game/src/
 endif
 
 clean:
 	@${MAKE} --no-print-directory -C raylib-master -f Makefile clean
 	@${MAKE} --no-print-directory -C game -f Makefile clean
+
+	rm -rf bin/Debug/game/
 
 help:
 	@echo "Usage: make [config=name] [target]"

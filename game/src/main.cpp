@@ -206,8 +206,8 @@ class Game
             score = 0;
             InitFood();
             InitAudioDevice();
-            eat = LoadSound("game/src/Sounds/eat.mp3");
-            wall = LoadSound("game/src/Sounds/wall.mp3");            
+            eat = LoadSound("game/src/assets/Sounds/eat.mp3");
+            wall = LoadSound("game/src/assets/Sounds/wall.mp3");            
         }
 
         ~Game() {
@@ -286,14 +286,17 @@ class Game
 
             // Difficulty
             if(GuiButton(Rectangle{(float) width + offset*2, (float) offset*1.3f, 100.0f, 20.0f}, "Easy")) {
+                userDifficulty = EASY;
                 GameOver();
             }
 
             if(GuiButton(Rectangle{(float) width + offset*3.2f, (float) offset*1.3f, 100.0f, 20.0f}, "Medium")) {
+                userDifficulty = MEDIUM;
                 GameOver();
             }
 
             if(GuiButton(Rectangle{(float) width + offset*4.4f, (float) offset*1.3f, 100.0f, 20.0f}, "Hard")) {
+                userDifficulty = HARD;
                 GameOver();
             }
 
@@ -407,8 +410,6 @@ int main () {
     backgrounds["plain"] = "0";
     backgrounds["tiny"] = "t.png";
     backgrounds["dirt"] = "d.png";
-
-    ExportImageAsCode();
 
     while(!WindowShouldClose()) {
         BeginDrawing();
