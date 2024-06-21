@@ -170,7 +170,6 @@ class Food
             Image image = LoadImage("game/src/assets/food.png");
             texture = LoadTextureFromImage(image);
             UnloadImage(image);
-            // position = generateRandomPos();
         }
         
         ~Food() {
@@ -178,7 +177,6 @@ class Food
         }
         
         void Draw(){
-            // DrawRectangle(position.x * cellSize, position.y * cellSize, cellSize, cellSize, darkgreen);
             DrawTexture(texture, offset + position.x * cellSize, offset + position.y * cellSize, WHITE);
         }
 
@@ -259,15 +257,20 @@ class Game
             // Settings
             DrawText("Settings", width + offset*2, 20, 40, darkgreen);
 
+            // Difficulty
+            DrawText("Difficulty", width + offset*2, offset, 20, darkgreen);
+
             // Limitless Bounds
-            GuiCheckBox(Rectangle{(float) width + offset*2, (float) offset, 20.0f, 20.0f}, "Enable Limitless Bounds", &infBounds);
+            DrawText("Limitless Bounds", width + offset*2, offset*2.4f, 20, darkgreen);
+            GuiCheckBox(Rectangle{(float) width + offset*2, (float) offset*2.6f, 20.0f, 20.0f}, "Enable Limitless Bounds", &infBounds);
 
             // Cell Count Slider
             char* sliderCellCountString = (char *) malloc(10);
             stringToCharArray(std::to_string((int) sliderCellCount), sliderCellCountString);
-            DrawText("Cell Count: ", width + offset*2, offset*1.8f, 20, darkgreen);
-            GuiTextBox(Rectangle{(float) width + offset*3.2f, (float) offset*1.8f, 30.0f, 20.0f}, sliderCellCountString, 100, false);
-            GuiSlider(Rectangle{(float) width + offset*2, (float) offset*2, 200.0f, 20.0f}, "10", "50", &sliderCellCount, 10, 50);
+            DrawText("Cell Count: ", width + offset*2, offset*3.6f, 20, darkgreen);
+            GuiTextBox(Rectangle{(float) width + offset*3.2f, (float) offset*3.6f, 20.0f, 20.0f}, sliderCellCountString, 100, false);
+            GuiSlider(Rectangle{(float) width + offset*2, (float) offset*3.8f, 200.0f, 20.0f}, "10", "50", &sliderCellCount, 10, 50);
+
             
             snake.Draw();
             food.Draw();
@@ -281,12 +284,27 @@ class Game
 
             snake.changeDirection(GetKeyPressed());
 
+            // Difficulty
+            if(GuiButton(Rectangle{(float) width + offset*2, (float) offset*1.3f, 100.0f, 20.0f}, "Easy")) {
+                GameOver();
+            }
+
+            if(GuiButton(Rectangle{(float) width + offset*3.2f, (float) offset*1.3f, 100.0f, 20.0f}, "Medium")) {
+                GameOver();
+            }
+
+            if(GuiButton(Rectangle{(float) width + offset*4.4f, (float) offset*1.3f, 100.0f, 20.0f}, "Hard")) {
+                GameOver();
+            }
+
+            // Infinite bounds
             if(infBounds != infiniteBoundaries) {
                 infiniteBoundaries = infBounds;
                 GameOver();
             }
 
-            if(GuiButton(Rectangle{(float) width + offset*2, (float) offset*2.3f, 100.0f, 20.0f}, "Apply")) {
+            // Cell count
+            if(GuiButton(Rectangle{(float) width + offset*2, (float) offset*4.2f, 100.0f, 20.0f}, "Apply")) {
                 cellCount = sliderCellCount;
                 width = cellCount * cellSize;
                 height = cellCount * cellSize;
@@ -294,7 +312,7 @@ class Game
                 GameOver();
             }
 
-            if(GuiButton(Rectangle{(float) width + offset*3, (float) offset*2.3f, 100.0f, 20.0f}, "Cancel")) {
+            if(GuiButton(Rectangle{(float) width + offset*3, (float) offset*4.2f, 100.0f, 20.0f}, "Cancel")) {
                 sliderCellCount = cellCount;
             }
 
@@ -356,7 +374,6 @@ class Game
             InitFood();
             gameRunning = 0;
 
-            //TODO, add max score functionality
             score = 0;
 
             PlaySound(wall);
@@ -380,15 +397,18 @@ class Game
 
 int main () {
     std::cout << "Starting game" << std::endl;
-    reinit:
+
     InitWindow(width + offset*2 + settingsOffset, height + offset*2, game);
     SetTargetFPS(60);
+    
     Game game = Game();
 
     // initialize backgrounds
     backgrounds["plain"] = "0";
     backgrounds["tiny"] = "t.png";
     backgrounds["dirt"] = "d.png";
+
+    ExportImageAsCode();
 
     while(!WindowShouldClose()) {
         BeginDrawing();
@@ -397,9 +417,6 @@ int main () {
 
         game.Draw();
         game.Update();
-
-        // std::cout << "MouseX: " << GetMouseX() << std::endl;
-        // std::cout << "MouseY: " << GetMouseY() << std::endl;
 
         EndDrawing();
     }
