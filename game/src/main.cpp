@@ -365,7 +365,7 @@ class Game
         void changeBackground() {
             if(currentBackground.compare("0")) {
                 char* path = (char*) malloc(100); 
-                stringToCharArray("game/src/assets/" + currentBackground, path);
+                stringToCharArray("game/src/assets/backgrounds" + currentBackground, path);
                 Image customImageBg = LoadImage(path);
                 ImageResize(&customImageBg, cellSize * cellCount, cellSize * cellCount);
                 customBg = LoadTextureFromImage(customImageBg);
