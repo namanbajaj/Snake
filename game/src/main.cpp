@@ -4,14 +4,16 @@
 #include <raymath.h>
 #include <map>
 #include <sstream>
+#include <vector>
+#include <algorithm>
+
 #define RAYGUI_IMPLEMENTATION
 #include <raygui.h>
-#include <vector>
-
-// ended at 30:00
 
 int cellSize = 30;
 int cellCount = 25;
+float sliderCellCount = (float) cellCount;
+
 int offset = 100;
 int settingsOffset = 400;
 
@@ -24,6 +26,9 @@ int gameRunning = 0;
 
 std::string keyboardBuffer = "";
 int tMode = 0;
+std::map<std::string, std::string> backgrounds;
+std::string currentBackground = "0";
+int changeBackgroundFlag = 0;
 
 std::string Vector2AsString(Vector2 v) {
     std::ostringstream s;
@@ -31,7 +36,14 @@ std::string Vector2AsString(Vector2 v) {
     return s.str();
 }
 
+void stringToCharArray(std::string str, char* arr) {
+    std::vector<char> vec(str.begin(), str.end());
+    vec.push_back('\0');
+    std::copy(vec.begin(), vec.end(), arr);
+}
+
 double EASY = 0.2;
+double MEDIUM = 0.1;
 double HARD = 0.05;
 double lastUpdateTime = 0;
 int eventTriggered(double interval) {
@@ -47,6 +59,7 @@ int eventTriggered(double interval) {
 double userDifficulty = EASY;
 
 int infiniteBoundaries = 0;
+bool infBounds = false;
 
 struct Color lightgreen = {173, 204, 96, 255};
 struct Color darkgreen = {43, 51, 24, 255};
@@ -63,9 +76,6 @@ std::map<int, Vector2> translateUserInput = {
     {KEY_RIGHT, RIGHT}
 };
 
-bool infBounds = false;
-float sliderCellCount = (float) cellCount;
-
 class Snake 
 {
     public:
@@ -74,8 +84,7 @@ class Snake
 
         void Draw() {
             for(int i = 0; i < body.size(); i++) {
-                Vector2 coord = body.at(i);
-                // DrawRectangle(coord.x * cellSize, coord.y * cellSize, cellSize, cellSize, GRAY);
+                Vector2 coord = body[i];
                 Rectangle rec = Rectangle{offset + coord.x * cellSize, offset + coord.y * cellSize, (float) cellSize, (float) cellSize};
                 DrawRectangleRounded(rec, 0.5, 6, darkgreen);
             }
@@ -110,16 +119,39 @@ class Snake
 
                 currentDirection = desiredDirection;
             }
-            else if(key == 84 || key == 73 || key == 78 || key == 89) {
+            else if(key >= 65 && key <= 90) {
+                // std::cout << "KEY PRESSED: " << key << std::endl;
+                keyboardBuffer.push_back(key);
+                transform(keyboardBuffer.begin(), keyboardBuffer.end(), keyboardBuffer.begin(), ::tolower);
                 // std::cout << "KBB SIZE:" << keyboardBuffer.size() << std::endl;
                 // std::cout << "KBB SIZE:" << keyboardBuffer << std::endl;
-                if(keyboardBuffer.size() == 0 && key == KEY_T) keyboardBuffer.push_back('a');
-                else if(keyboardBuffer.size() == 1 && key == KEY_I) keyboardBuffer.push_back('a');
-                else if(keyboardBuffer.size() == 2 && key == KEY_N) keyboardBuffer.push_back('a');
-                else if(keyboardBuffer.size() == 3 && key == KEY_Y) {
-                    keyboardBuffer.push_back('a');
-                    tMode = 1;
+
+                std::vector<std::string> keys;
+                for(auto const& imap: backgrounds){
+                    keys.push_back(imap.first);
                 }
+
+                for(auto bgName : keys) {
+                    // std::cout << bgName << "|";
+                    if(keyboardBuffer.find(bgName) != std::string::npos) {
+                        // std::cout << "MATCH FOUND" << std::endl;
+
+                        currentBackground = backgrounds[bgName];
+                        changeBackgroundFlag = 1;
+
+                        keyboardBuffer.clear();
+                    }
+                }
+
+                // if(keyboardBuffer.size() == 0 && key == KEY_T) keyboardBuffer.push_back('a');
+                // else if(keyboardBuffer.size() == 1 && key == KEY_I) keyboardBuffer.push_back('a');
+                // else if(keyboardBuffer.size() == 2 && key == KEY_N) keyboardBuffer.push_back('a');
+                // else if(keyboardBuffer.size() == 3 && key == KEY_Y) {
+                //     keyboardBuffer.push_back('a');
+                //     currentBackground = "d.png";
+                //     changeBackgroundFlag = 1;
+                // }
+
             }
         }
 
@@ -180,18 +212,14 @@ class Game
         int score;
         Sound eat;
         Sound wall;
-        Texture2D tiny;
+        Texture2D customBg;
 
         Game() {
             score = 0;
             InitFood();
             InitAudioDevice();
             eat = LoadSound("game/src/Sounds/eat.mp3");
-            wall = LoadSound("game/src/Sounds/wall.mp3");
-            Image t = LoadImage("game/src/assets/bg.png");
-            ImageResize(&t, cellSize * cellCount, cellSize * cellCount);
-            tiny = LoadTextureFromImage(t);
-            UnloadImage(t);
+            wall = LoadSound("game/src/Sounds/wall.mp3");            
         }
 
         ~Game() {
@@ -217,8 +245,12 @@ class Game
                 }
             }
             
-            if(tMode) {
-                DrawTexture(tiny, offset, offset, WHITE);
+            if(currentBackground.compare("0")) {
+                // std::cout << "DRAWING CUSTOM BACKGROUND" << std::endl;
+                DrawTexture(customBg, offset, offset, WHITE);
+            }
+            else {
+                // std::cout << "DRAWING PLAIN BACKGROUND" << std::endl;
             }
 
             // Draw gridlines
@@ -241,11 +273,8 @@ class Game
             GuiCheckBox(Rectangle{(float) width + offset*2, (float) offset, 20.0f, 20.0f}, "Enable Limitless Bounds", &infBounds);
 
             // Cell Count Slider
-            int tempCellCount = sliderCellCount;
-            std::string str = std::to_string(tempCellCount);
-            std::vector<char> vec(str.begin(), str.end());
-            vec.push_back('\0');
-            char* sliderCellCountString = vec.data();
+            char* sliderCellCountString = (char *) malloc(10);
+            stringToCharArray(std::to_string((int) sliderCellCount), sliderCellCountString);
             DrawText("Cell Count: ", width + offset*2, offset*1.8f, 20, darkgreen);
             GuiTextBox(Rectangle{(float) width + offset*3.2f, (float) offset*1.8f, 30.0f, 20.0f}, sliderCellCountString, 100, false);
             GuiSlider(Rectangle{(float) width + offset*2, (float) offset*2, 200.0f, 20.0f}, "10", "50", &sliderCellCount, 10, 50);
@@ -255,8 +284,12 @@ class Game
         }
 
         void Update() {
-            snake.changeDirection(GetKeyPressed());
+            if(changeBackgroundFlag) {
+                changeBackground();
+                changeBackgroundFlag = 0;
+            }
 
+            snake.changeDirection(GetKeyPressed());
 
             if(infBounds != infiniteBoundaries) {
                 infiniteBoundaries = infBounds;
@@ -339,6 +372,17 @@ class Game
             PlaySound(wall);
         }
 
+        void changeBackground() {
+            if(currentBackground.compare("0")) {
+                char* path = (char*) malloc(100); 
+                stringToCharArray("game/src/assets/" + currentBackground, path);
+                Image customImageBg = LoadImage(path);
+                ImageResize(&customImageBg, cellSize * cellCount, cellSize * cellCount);
+                customBg = LoadTextureFromImage(customImageBg);
+                UnloadImage(customImageBg);
+            }
+        }
+
     private:
         Image gridImage = LoadImage("game/src/assets/grid.png");
         Texture gridTile = LoadTextureFromImage(gridImage);
@@ -351,10 +395,14 @@ int main () {
     SetTargetFPS(60);
     Game game = Game();
 
+    // initialize backgrounds
+    backgrounds["plain"] = "0";
+    backgrounds["tiny"] = "t.png";
+    backgrounds["dirt"] = "d.png";
 
     while(!WindowShouldClose()) {
         BeginDrawing();
-
+        
         ClearBackground(lightgreen);
 
         game.Draw();
