@@ -142,16 +142,6 @@ class Snake
                         keyboardBuffer.clear();
                     }
                 }
-
-                // if(keyboardBuffer.size() == 0 && key == KEY_T) keyboardBuffer.push_back('a');
-                // else if(keyboardBuffer.size() == 1 && key == KEY_I) keyboardBuffer.push_back('a');
-                // else if(keyboardBuffer.size() == 2 && key == KEY_N) keyboardBuffer.push_back('a');
-                // else if(keyboardBuffer.size() == 3 && key == KEY_Y) {
-                //     keyboardBuffer.push_back('a');
-                //     currentBackground = "d.png";
-                //     changeBackgroundFlag = 1;
-                // }
-
             }
         }
 
