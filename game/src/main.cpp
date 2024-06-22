@@ -8,7 +8,7 @@
 #include <algorithm>
 
 #define RAYGUI_IMPLEMENTATION
-#include <raygui.h>
+#include "raygui.h"
 
 int cellSize = 30;
 int cellCount = 25;

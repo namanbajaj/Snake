@@ -1,0 +1,1 @@
+emcc -o ../bin/Debug/main.html ../game/src/main.cpp -Os -Wall libraylib.a -I. -I ../raylib-master/src -L. -L libraylib.a -s USE_GLFW=3 -s ASYNCIFY --shell-file ../raylib-master/src/shell.html -DPLATFORM_WEB
