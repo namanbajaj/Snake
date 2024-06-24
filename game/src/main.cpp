@@ -282,6 +282,11 @@ class Game
                 changeBackgroundFlag = 0;
             }
 
+            // test mouse input
+            if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                std::cout << "Mouse clicked" << std::endl;
+            }
+
             snake.changeDirection(GetKeyPressed());
 
             // Difficulty
@@ -400,7 +405,7 @@ class Game
 
 int main () {
     std::cout << "Starting game" << std::endl;
-
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
     InitWindow(width + offset*2 + settingsOffset, height + offset*2, game);
     SetTargetFPS(60);
     
@@ -416,8 +421,10 @@ int main () {
         
         ClearBackground(lightgreen);
 
-        game.Draw();
         game.Update();
+        game.Draw();
+
+        DrawFPS(10, 10);
 
         EndDrawing();
     }
